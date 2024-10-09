@@ -8,7 +8,7 @@
 #include "Object3D.h"
 #include "SoundManager.h"
 #include "Input.h"
-#include "LightManager.h" 
+#include "LightManager.h"
 
 // ゲームプレイシーン
 class GamePlayScene : public BaseScene
