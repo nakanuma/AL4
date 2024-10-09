@@ -1,13 +1,14 @@
 #pragma once
 #include "ModelManager.h"
 #include "Object3D.h"
+#include "Input.h"
 
 class Player {
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(ModelManager::ModelData* modelPlayer);
+	void Initialize(Input* input, ModelManager::ModelData* modelPlayer);
 
 	/// <summary>
 	/// 更新
@@ -25,6 +26,9 @@ public:
 	void Debug();
 
 private:
+	// 汎用機能
+	Input* input_;
+
 	// プレイヤー本体オブジェクト
 	std::unique_ptr<Object3D> objectPlayer_;
 

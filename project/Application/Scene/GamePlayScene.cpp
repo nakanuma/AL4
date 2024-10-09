@@ -49,10 +49,9 @@ void GamePlayScene::Initialize()
 	modelPlayer_ = ModelManager::LoadModelFile("resources/Models", "cube.obj", dxBase->GetDevice());
 	modelPlayer_.material.textureHandle = TextureManager::Load("resources/Images/uvChecker.png", dxBase->GetDevice());
 
-	// プレイヤー本体の生成
+	// プレイヤー本体の生成と初期化
 	player_ = std::make_unique<Player>();
-	// モデルを渡して初期化
-	player_->Initialize(&modelPlayer_);
+	player_->Initialize(input, &modelPlayer_);
 }
 
 void GamePlayScene::Finalize()
