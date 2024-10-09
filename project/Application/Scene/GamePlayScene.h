@@ -10,6 +10,8 @@
 #include "Input.h"
 #include "LightManager.h"
 
+#include "Player.h"
+
 // ゲームプレイシーン
 class GamePlayScene : public BaseScene
 {
@@ -37,9 +39,12 @@ private:
 	/// ↓ ゲームシーン用
 	///
 
-	// モデルデータ
-	ModelManager::ModelData model_;
-	// 3Dオブジェクト
-	std::unique_ptr<Object3D> object_;
+	/* プレイヤー関連 */
+
+	// プレイヤーモデル
+	ModelManager::ModelData modelPlayer_;
+
+	// プレイヤー本体
+	std::unique_ptr<Player> player_;
 };
 
