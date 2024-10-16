@@ -714,7 +714,7 @@ void DirectXBase::EndFrame()
 		// 指定したSignalにたどりついていないので、たどり着くまで待つようにイベントを設定する
 		fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
 		// FPS固定
-		UpdateFixFPS();
+		/*UpdateFixFPS();*/
 		// イベント待つ
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}

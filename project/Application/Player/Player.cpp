@@ -68,13 +68,13 @@ void Player::Update() {
 	///	移動制限
 	///
 
-	// 移動限界座標
-	const float kMoveLimitX = 18.0f;
-	const float kMoveLimitY = 10.0f;
+	//// 移動限界座標
+	//const float kMoveLimitX = 18.0f;
+	//const float kMoveLimitY = 10.0f;
 
-	// 範囲を超えないようにする
-	objectPlayer_->transform_.translate.x = std::clamp(objectPlayer_->transform_.translate.x, -kMoveLimitX, kMoveLimitX);
-	objectPlayer_->transform_.translate.y = std::clamp(objectPlayer_->transform_.translate.y, -kMoveLimitY, kMoveLimitY);
+	//// 範囲を超えないようにする
+	//objectPlayer_->transform_.translate.x = std::clamp(objectPlayer_->transform_.translate.x, -kMoveLimitX, kMoveLimitX);
+	//objectPlayer_->transform_.translate.y = std::clamp(objectPlayer_->transform_.translate.y, -kMoveLimitY, kMoveLimitY);
 
 	///
 	///	弾の発射

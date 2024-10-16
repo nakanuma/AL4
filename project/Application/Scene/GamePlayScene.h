@@ -11,6 +11,7 @@
 #include "LightManager.h"
 
 #include "Player.h"
+#include "Skydome.h"
 
 // ゲームプレイシーン
 class GamePlayScene : public BaseScene
@@ -51,5 +52,19 @@ private:
 
 	// プレイヤー本体
 	std::unique_ptr<Player> player_;
+
+	/* その他 */
+
+	// レールの制御点
+	std::vector<Float3> controlPoints_;
+	// 制御点描画用の球モデル
+	ModelManager::ModelData modelSphere_;
+	// 制御点描画用のオブジェクト
+	std::list<std::unique_ptr<Object3D>> objectSpheres_;
+
+	// 天球
+	std::unique_ptr<Skydome> skydome_;
+	// 天球モデル
+	ModelManager::ModelData modelSkydome_;
 };
 

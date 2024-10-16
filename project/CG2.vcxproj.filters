@@ -60,6 +60,7 @@
     <ClCompile Include="Engine\DirectX\RTVManager.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
     <ClCompile Include="Application\Player\PlayerBullet.cpp" />
+    <ClCompile Include="Application\Skydome\Skydome.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\GlobalVariables\GlobalVariables.h" />
@@ -113,6 +114,7 @@
     <ClInclude Include="Engine\3D\LightManager.h" />
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Player\PlayerBullet.h" />
+    <ClInclude Include="Application\Skydome\Skydome.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\Shaders\Particle.hlsli" />
