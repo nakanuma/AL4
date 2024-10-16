@@ -59,6 +59,12 @@ public:
 	/// </summary>
 	void Set3DReticleFromCursor();
 
+	/// <summary>
+	/// 親となるトランスフォーム
+	/// </summary>
+	/// <param name="parent"></param>
+	void SetParent(const Transform* parent);
+
 private:
 	// 汎用機能
 	Input* input_;

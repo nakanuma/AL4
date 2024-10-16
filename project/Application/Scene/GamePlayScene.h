@@ -32,6 +32,9 @@ public:
 	// デバッグ表示
 	void Debug();
 
+	// レールカメラ更新
+	void UpdateRailCamera();
+
 private:
 	std::unique_ptr<Camera> camera = nullptr;
 	std::unique_ptr<SpriteCommon> spriteCommon = nullptr;
@@ -61,6 +64,9 @@ private:
 	ModelManager::ModelData modelSphere_;
 	// 制御点描画用のオブジェクト
 	std::list<std::unique_ptr<Object3D>> objectSpheres_;
+
+	bool stop;
+	float t = 0.0f;
 
 	// 天球
 	std::unique_ptr<Skydome> skydome_;

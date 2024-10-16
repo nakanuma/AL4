@@ -8,6 +8,6 @@ public:
 	Float3 rotate;
 	Float3 translate;
 
-	Matrix MakeAffineMatrix();
+	Matrix MakeAffineMatrix() const;
 };
 

@@ -19,6 +19,7 @@ void Player::Initialize(Input* input, ModelManager::ModelData* modelPlayer, Mode
 	// プレイヤー本体の生成
 	objectPlayer_ = std::make_unique<Object3D>();
 	objectPlayer_->model_ = modelPlayer;
+	objectPlayer_->transform_.translate = { 0.0f, -2.0f, 5.0f };
 	// プレイヤーの弾モデルをセット
 	modelPlayerBullet_ = modelPlayerBullet;
 
@@ -102,7 +103,7 @@ void Player::Draw() {
 	objectPlayer_->Draw();
 
 	// 3Dレティクルを描画
-	/*object3DReticle_->Draw();*/
+	object3DReticle_->Draw();
 
 	// 弾を描画
 	for (auto& bullet : bullets_) {
@@ -129,7 +130,7 @@ void Player::Attack() {
 		Float3 velocity(0, 0, kBulletSpeed);
 
 		// 自機から照準オブジェクトへのベクトル
-		velocity = object3DReticle_->transform_.translate - objectPlayer_->transform_.translate;
+		velocity = object3DReticle_->transform_.translate - position;
 		velocity = Float3::Normalize(velocity) * kBulletSpeed;
 
 		// 速度ベクトルを自機の向きに合わせて回転させる
@@ -154,10 +155,17 @@ void Player::Debug() {
 
 Float3 Player::GetWorldPosition() {
 	Float3 worldPos;
+
+	// カメラを適用
+	Matrix playerMatrix = objectPlayer_->worldMatrix_;
+	Matrix cameraMatrix = Camera::GetCurrent()->transform.MakeAffineMatrix();
+
+	playerMatrix *= cameraMatrix;
+
 	// ワールド行列の平行移動成分を取得
-	worldPos.x = objectPlayer_->worldMatrix_.r[3][0];
-	worldPos.y = objectPlayer_->worldMatrix_.r[3][1];
-	worldPos.z = objectPlayer_->worldMatrix_.r[3][2];
+	worldPos.x = playerMatrix.r[3][0];
+	worldPos.y = playerMatrix.r[3][1];
+	worldPos.z = playerMatrix.r[3][2];
 
 	return worldPos;
 }
@@ -204,4 +212,9 @@ void Player::Set3DReticleFromCursor() {
 
 	// 2Dスプライトの更新
 	sprite2DReticle_->Update();
+}
+
+void Player::SetParent(const Transform* parent)
+{
+	objectPlayer_->SetParent(parent);
 }

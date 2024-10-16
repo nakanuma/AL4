@@ -1,6 +1,6 @@
 #include "Transform.h"
 
-Matrix Transform::MakeAffineMatrix()
+Matrix Transform::MakeAffineMatrix() const
 {
     Matrix result = Matrix::Identity();
 

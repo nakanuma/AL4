@@ -31,6 +31,7 @@ void GamePlayScene::Initialize()
 	// LightManagerの初期化
 	lightManager = LightManager::GetInstance();
 	lightManager->Initialize();
+	lightManager->directionalLightCB_.data_->intensity = 2.5f;
 
 	///
 	///	↓ ゲームシーン用 
@@ -57,16 +58,19 @@ void GamePlayScene::Initialize()
 	player_ = std::make_unique<Player>();
 	player_->Initialize(input, &modelPlayer_, &modelPlayerBullet_);
 
+	// プレイヤーとカメラの親子関係を結ぶ
+	player_->SetParent(&camera->transform);
+
 	/* レールカメラ */
 
 	// スプライン曲線制御点（通過点）を設定
 	controlPoints_ = {
 		{0.0f,  0.0f,  0.0f},
-		{10.0f, 10.0f, 0.0f},
-		{10.0f, 15.0f, 0.0f},
-		{20.0f, 15.0f, 0.0f},
-		{20.0f, 0.0f,  0.0f},
-		{30.0f, 0.0f,  0.0f},
+		{10.0f,  5.0f,  10.0f},
+		{20.0f,  10.0f, 20.0f},
+		{20.0f,  20.0f, 15.0f},
+		{10.0f,  20.0f, 30.0f},
+		{10.0f,  10.0f, 25.0f},
 	};
 
 	// 制御点用の球を読み込み
@@ -106,12 +110,9 @@ void GamePlayScene::Update() {
 	skydome_->Update();
 
 	// レールカメラ更新
-	/*static float t = 0.0f;
-	t += 0.01f;
+	UpdateRailCamera();
 
-	camera->transform.translate = Float3::CatmullRomPosition(controlPoints_, t);*/
-
-	// 制御点の更新
+	// 制御点オブジェクトの更新
 	for(auto& sphere : objectSpheres_){
 		sphere->UpdateMatrix();
 	}
@@ -190,9 +191,41 @@ void GamePlayScene::Debug() {
 
 	ImGui::Text("%.2f", ImGui::GetIO().Framerate);
 
-	ImGui::DragFloat3("camera.translate", &camera->transform.translate.x, 0.01f);
+	ImGui::DragFloat3("camera.translate", &camera->transform.translate.x, 0.1f);
 	ImGui::DragFloat3("camera.rotate", &camera->transform.rotate.x, 0.01f);
 
+	ImGui::Checkbox("railcamera.stop", &stop);
+	ImGui::DragFloat("timer", &t);
 
 	ImGui::End();
+}
+
+void GamePlayScene::UpdateRailCamera()
+{
+	if (!stop) {
+		t += 0.001f;
+	}
+	if (t > 1.0f) t = 1.0f; // スプラインの終端で止まるようにする
+
+	// 視点（カメラのある位置）
+	Float3 eye = Float3::CatmullRomPosition(controlPoints_, t);
+	camera->transform.translate = eye;
+
+	// 少し先の位置を計算して、注視点とする
+	float nextT = t + 0.05f;
+	if (nextT > 1.0f) nextT = 1.0f; // 範囲の制限
+
+	Float3 target = Float3::CatmullRomPosition(controlPoints_, nextT);
+
+	// 差分ベクトルから回転角を計算する
+	Float3 forward = target - eye;
+	if (forward.z == 0) { // 0除算を回避
+		forward.z = 0.001f;
+	}
+
+	float yaw = atan2f(forward.x, forward.z); // Y軸周り
+	float pitch = atan2f(-forward.y, sqrtf(forward.x * forward.x + forward.z * forward.z)); // X軸周り
+	float roll = 0.0f; // Z軸周り
+
+	camera->transform.rotate = { pitch, yaw, roll };
 }

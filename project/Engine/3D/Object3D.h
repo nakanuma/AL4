@@ -34,7 +34,7 @@ public:
 	void UpdateMatrix();
 
 	// 親オブジェクトを設定
-	void SetParent(Object3D* parent) { parent_ = parent; }
+	void SetParent(const Transform* parent) { parent_ = parent; }
 
 	// 描画（モデル内のテクスチャを参照 / テクスチャを指定して描画）
 	void Draw();
@@ -60,8 +60,10 @@ public:
 	// ワールド行列
 	Matrix worldMatrix_;
 
+	// 親オブジェクトのTransform
+	const Transform* parent_ = nullptr;
+
 private:
-	// 親オブジェクトへのポインタ
-	Object3D* parent_ = nullptr;
+
 };
 

@@ -9,7 +9,7 @@ void Skydome::Initialize(ModelManager::ModelData* modelSkydome)
 	objectSkydome_->model_ = modelSkydome;
 
 	// サイズを変更
-	objectSkydome_->transform_.scale = { 500.0f, 500.0f, 500.0f };
+	objectSkydome_->transform_.scale = { 100.0f, 100.0f, 100.0f };
 }
 
 void Skydome::Update()
