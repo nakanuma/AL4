@@ -1,8 +1,8 @@
 #include "Player.h"
-#include <cassert>
+#include "Camera.h"
 #include "ImguiWrapper.h"
 #include "MyWindow.h"
-#include "Camera.h"
+#include <cassert>
 
 void Player::Initialize(Input* input, ModelManager::ModelData* modelPlayer, ModelManager::ModelData* modelPlayerBullet) {
 	DirectXBase* dxBase = DirectXBase::GetInstance();
@@ -36,56 +36,16 @@ void Player::Initialize(Input* input, ModelManager::ModelData* modelPlayer, Mode
 
 void Player::Update() {
 	///
-	///	3Dレティクルの配置
-	/// 
-
-	// 自機のワールド座標から3Dレティクルのワールド座標を計算
-	// 自機から3Dレティクルへの距離
-	const float kDistancePlayerTo3DReticle = 50.0f;
-	// 自機から3Dレティクルへのオフセット（Z+向き）
-	Float3 offset = {0, 0, 1.0f};
-	// 自機のワールド行列の回転を反映
-	offset = Float3::TransformNormal(offset, objectPlayer_->worldMatrix_);
-	// ベクトルの長さを整える
-	offset = Float3::Normalize(offset) * kDistancePlayerTo3DReticle;
-	// 3Dレティクルの座標を設定
-	object3DReticle_->transform_.translate = objectPlayer_->transform_.translate + offset;
-	object3DReticle_->UpdateMatrix();
-
-
-	// 3Dレティクルのワールド座標から2Dレティクルのスクリーン座標を計算
-	// 3Dレティクルのワールド行列から、ワールド座標を取得
-	Float3 positionReticle = {
-		object3DReticle_->worldMatrix_.r[3][0], 
-		object3DReticle_->worldMatrix_.r[3][1], 
-		object3DReticle_->worldMatrix_.r[3][2]
-	};
-
-	// ビュー行列
-	Matrix viewMatrix = Camera::GetCurrent()->MakeViewMatrix();
-	// プロジェクション行列
-	Matrix projectionMatrix = Camera::GetCurrent()->MakePerspectiveFovMatrix();
-	// ビューポート行列
-	Matrix matViewport = Matrix::MakeViewportMatrix(0, 0, static_cast<float>(Window::GetWidth()), static_cast<float>(Window::GetHeight()), 0, 1);
-
-	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
-	Matrix matViewProjectionViewport = viewMatrix * projectionMatrix * matViewport;
-	// ワールド->スクリーン座標変換
-	positionReticle = Float3::Transform(positionReticle, matViewProjectionViewport);
-	// スプライトのレティクルに座標設定
-	sprite2DReticle_->SetPosition({positionReticle.x, positionReticle.y});
-
+	///	マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクルを配置
 	///
-	///	2Dレティクルの更新
-	///		
 
-	sprite2DReticle_->Update();
+	Set3DReticleFromCursor();
 
 	///
 	///	移動処理
-	/// 
+	///
 
-	Float3 move = {0.0f, 0.0f, 0.0f}; // プレイヤーの移動ベクトル
+	Float3 move = {0.0f, 0.0f, 0.0f};   // プレイヤーの移動ベクトル
 	const float kCharacterSpeed = 0.2f; // プレイヤーの移動速度
 
 	// 押したキーで移動ベクトルを変更
@@ -93,11 +53,11 @@ void Player::Update() {
 		move.x -= kCharacterSpeed;
 	} else if (input_->PushKey(DIK_D)) {
 		move.x += kCharacterSpeed;
-	} 
-	
+	}
+
 	if (input_->PushKey(DIK_W)) {
 		move.y += kCharacterSpeed;
-	} else if (input_->PushKey(DIK_S)) { 
+	} else if (input_->PushKey(DIK_S)) {
 		move.y -= kCharacterSpeed;
 	}
 
@@ -106,7 +66,7 @@ void Player::Update() {
 
 	///
 	///	移動制限
-	///	
+	///
 
 	// 移動限界座標
 	const float kMoveLimitX = 18.0f;
@@ -118,7 +78,7 @@ void Player::Update() {
 
 	///
 	///	弾の発射
-	/// 
+	///
 
 	Attack();
 
@@ -128,14 +88,12 @@ void Player::Update() {
 	}
 
 	// デスフラグの立った弾を削除
-	bullets_.remove_if([](const std::unique_ptr<PlayerBullet>& bullet) { 
-		return bullet->IsDead();
-	});
+	bullets_.remove_if([](const std::unique_ptr<PlayerBullet>& bullet) { return bullet->IsDead(); });
 
 	///
 	///	行列を更新
-	/// 
-	
+	///
+
 	objectPlayer_->UpdateMatrix();
 }
 
@@ -155,14 +113,14 @@ void Player::Draw() {
 	Debug();
 }
 
-void Player::DrawUI() { 
+void Player::DrawUI() {
 	// 2Dレティクルを描画
-	sprite2DReticle_->Draw(); 
+	sprite2DReticle_->Draw();
 }
 
-void Player::Attack() { 
-	// 一旦スペースキーで弾を発射
-	if (input_->TriggerKey(DIK_SPACE)) {
+void Player::Attack() {
+	// 左クリックを押した瞬間のみ発射
+	if (input_->IsTriggerMouse(0)) {
 		// 自キャラの座標をコピー
 		Float3 position = GetWorldPosition();
 
@@ -183,19 +141,18 @@ void Player::Attack() {
 
 		// 弾を登録する
 		bullets_.push_back(std::move(newBullet));
-	} 
-
+	}
 }
 
-void Player::Debug() { 
-	ImGui::Begin("Player"); 
+void Player::Debug() {
+	ImGui::Begin("Player");
 
 	ImGui::DragFloat3("translation", &objectPlayer_->transform_.translate.x, 0.1f);
 
 	ImGui::End();
 }
 
-Float3 Player::GetWorldPosition() { 
+Float3 Player::GetWorldPosition() {
 	Float3 worldPos;
 	// ワールド行列の平行移動成分を取得
 	worldPos.x = objectPlayer_->worldMatrix_.r[3][0];
@@ -203,4 +160,48 @@ Float3 Player::GetWorldPosition() {
 	worldPos.z = objectPlayer_->worldMatrix_.r[3][2];
 
 	return worldPos;
+}
+
+void Player::Set3DReticleFromCursor() {
+	// マウス座標を取得する
+	POINT mousePosition;
+	GetCursorPos(&mousePosition);
+
+	// クライアントエリア座標に変換する
+	HWND hwnd = Window::GetHandle();
+	ScreenToClient(hwnd, &mousePosition);
+
+	// マウス座標を2Dレティクルのスプライトに代入する
+	sprite2DReticle_->SetPosition(Float2(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y)));
+
+	// ビュー行列
+	Matrix viewMatrix = Camera::GetCurrent()->MakeViewMatrix();
+	// プロジェクション行列
+	Matrix projectionMatrix = Camera::GetCurrent()->MakePerspectiveFovMatrix();
+	// ビューポート行列
+	Matrix matViewport = Matrix::MakeViewportMatrix(0, 0, static_cast<float>(Window::GetWidth()), static_cast<float>(Window::GetHeight()), 0, 1);
+
+	// ビュープロジェクションビューポート合成行列
+	Matrix matVPV = viewMatrix * projectionMatrix * matViewport;
+	// 合成行列の逆行列を計算する
+	Matrix matInverseVPV = Matrix::Inverse(matVPV);
+
+	// スクリーン座標
+	Float3 posNear = Float3(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y), 0);
+	Float3 posFar = Float3(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y), 1);
+	// スクリーン座標系からワールド座標系へ
+	posNear = Float3::Transform(posNear, matInverseVPV);
+	posFar = Float3::Transform(posFar, matInverseVPV);
+
+	// マウスレイの方向
+	Float3 mouseDirection = posFar - posNear;
+	// ベクトルの正規化
+	mouseDirection = Float3::Normalize(mouseDirection);
+	// カメラから照準オブジェクトの距離
+	const float kDistanceTestObject = 100.0f; // レールカメラ実装でずれる可能性あるので調整必須かも
+	object3DReticle_->transform_.translate = posNear + mouseDirection * kDistanceTestObject;
+	object3DReticle_->UpdateMatrix();
+
+	// 2Dスプライトの更新
+	sprite2DReticle_->Update();
 }

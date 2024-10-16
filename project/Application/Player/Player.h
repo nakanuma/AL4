@@ -54,6 +54,11 @@ public:
 	/// <returns>プレイヤー半径</returns>
 	float GetRadius() const { return kRadius_; }
 
+	/// <summary>
+	/// マウスカーソルのスクリーン座標からワールド座標を取得して3Dレティクル配置
+	/// </summary>
+	void Set3DReticleFromCursor();
+
 private:
 	// 汎用機能
 	Input* input_;
