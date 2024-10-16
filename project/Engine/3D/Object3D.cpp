@@ -23,6 +23,8 @@ Object3D::Object3D()
 void Object3D::UpdateMatrix()
 {
 	Matrix worldMatrix = transform_.MakeAffineMatrix();
+	worldMatrix_ = worldMatrix; // ワールド行列をメンバ変数に保持
+
 	// 親が存在する場合、親の行列を考慮する
 	if (parent_) {
 		Matrix parentWorldMatrix = parent_->transform_.MakeAffineMatrix(); // 親のワールド行列

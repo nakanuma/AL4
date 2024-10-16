@@ -43,4 +43,6 @@ struct Float3
     // CatmullRomスプライン曲線上の座標を得る
 	static Float3 CatmullRomPosition(const std::vector<Float3>& points, float t);
 
+    static Float3 TransformNormal(const Float3& v, const Matrix& m);
+
 };

@@ -59,6 +59,7 @@
     <ClCompile Include="Application\Scene\TitleScene.cpp" />
     <ClCompile Include="Engine\DirectX\RTVManager.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
+    <ClCompile Include="Application\Player\PlayerBullet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\GlobalVariables\GlobalVariables.h" />
@@ -111,6 +112,7 @@
     <ClInclude Include="Engine\DirectX\RTVManager.h" />
     <ClInclude Include="Engine\3D\LightManager.h" />
     <ClInclude Include="Application\Player\Player.h" />
+    <ClInclude Include="Application\Player\PlayerBullet.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\Shaders\Particle.hlsli" />

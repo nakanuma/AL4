@@ -49,9 +49,13 @@ void GamePlayScene::Initialize()
 	modelPlayer_ = ModelManager::LoadModelFile("resources/Models", "cube.obj", dxBase->GetDevice());
 	modelPlayer_.material.textureHandle = TextureManager::Load("resources/Images/uvChecker.png", dxBase->GetDevice());
 
+	// プレイヤーの弾モデル読み込み
+	modelPlayerBullet_ = ModelManager::LoadModelFile("resources/Models", "cube.obj", dxBase->GetDevice());
+	modelPlayerBullet_.material.textureHandle = TextureManager::Load("resources/Images/monsterBall.png", dxBase->GetDevice());
+
 	// プレイヤー本体の生成と初期化
 	player_ = std::make_unique<Player>();
-	player_->Initialize(input, &modelPlayer_);
+	player_->Initialize(input, &modelPlayer_, &modelPlayerBullet_);
 }
 
 void GamePlayScene::Finalize()
@@ -109,19 +113,26 @@ void GamePlayScene::Draw()
 
 #ifdef _DEBUG
 	GlobalVariables::getInstance()->Update();
+
+	// デバッグ表示
+	Debug();
 #endif // _DEBUG
-
-	ImGui::Begin("gameScene");
-
-	ImGui::DragFloat3("camera.translate", &camera->transform.translate.x, 0.01f);
-	ImGui::DragFloat3("camera.rotate", &camera->transform.rotate.x, 0.01f);
-
-	ImGui::End();
-
 	// ImGuiの内部コマンドを生成する
 	ImguiWrapper::Render(dxBase->GetCommandList());
 	// 描画後処理
 	dxBase->PostDraw();
 	// フレーム終了処理
 	dxBase->EndFrame();
+}
+
+void GamePlayScene::Debug() {
+	ImGui::Begin("GameScene"); 
+
+	ImGui::Text("%.2f", ImGui::GetIO().Framerate);
+
+	ImGui::DragFloat3("camera.translate", &camera->transform.translate.x, 0.01f);
+	ImGui::DragFloat3("camera.rotate", &camera->transform.rotate.x, 0.01f);
+
+
+	ImGui::End();
 }

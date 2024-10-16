@@ -57,6 +57,9 @@ public:
 	// トランスフォーム情報
 	Transform transform_;
 
+	// ワールド行列
+	Matrix worldMatrix_;
+
 private:
 	// 親オブジェクトへのポインタ
 	Object3D* parent_ = nullptr;

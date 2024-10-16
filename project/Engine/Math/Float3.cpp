@@ -1,5 +1,6 @@
 #include "Float3.h"
 #include "algorithm"
+#include "Matrix.h"
 
 Float3 Float3::operator+(const Float3& other) const { 
 	return {x + other.x, y + other.y, z + other.z}; }
@@ -97,6 +98,14 @@ Float3 Float3::CatmullRomPosition(const std::vector<Float3>& points, float t) {
 
 	// 4点を指定してCatmull-Rom補間
 	return CatmullRomInterplation(p0, p1, p2, p3, t_2);
+}
+
+Float3 Float3::TransformNormal(const Float3& v, const Matrix& m) { 
+	return Float3{
+		v.x * m.r[0][0] + v.y * m.r[1][0] + v.z * m.r[2][0], 
+		v.x * m.r[0][1] + v.y * m.r[1][1] + v.z * m.r[2][1], 
+		v.x * m.r[0][2] + v.y + m.r[1][2] + v.z * m.r[2][2]
+	};
 }
 
 Float3 operator*(float scalar, const Float3& vec) { 

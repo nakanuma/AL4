@@ -28,6 +28,9 @@ public:
 	// 描画
 	void Draw() override;
 
+	// デバッグ表示
+	void Debug();
+
 private:
 	std::unique_ptr<Camera> camera = nullptr;
 	std::unique_ptr<SpriteCommon> spriteCommon = nullptr;
@@ -43,6 +46,8 @@ private:
 
 	// プレイヤーモデル
 	ModelManager::ModelData modelPlayer_;
+	// プレイヤー弾モデル
+	ModelManager::ModelData modelPlayerBullet_;
 
 	// プレイヤー本体
 	std::unique_ptr<Player> player_;
