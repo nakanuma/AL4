@@ -28,6 +28,11 @@ public:
 	void Draw();
 
 	/// <summary>
+	/// UI描画
+	/// </summary>
+	void DrawUI();
+
+	/// <summary>
 	/// 攻撃
 	/// </summary>
 	void Attack();
@@ -52,7 +57,7 @@ public:
 private:
 	// 汎用機能
 	Input* input_;
-	SpriteCommon* spriteCommon_;
+	std::unique_ptr<SpriteCommon> spriteCommon = nullptr;
 
 	// プレイヤー本体オブジェクト
 	std::unique_ptr<Object3D> objectPlayer_;
@@ -68,4 +73,7 @@ private:
 
 	// 3Dレティクル用オブジェクト
 	std::unique_ptr<Object3D> object3DReticle_;
+
+	// 2Dレティクル用オブジェクト
+	std::unique_ptr<Sprite> sprite2DReticle_;
 };

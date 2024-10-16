@@ -100,6 +100,19 @@ Float3 Float3::CatmullRomPosition(const std::vector<Float3>& points, float t) {
 	return CatmullRomInterplation(p0, p1, p2, p3, t_2);
 }
 
+Float3 Float3::Transform(const Float3& v, const Matrix& m) { 
+	Float3 result;
+	result.x = v.x * m.r[0][0] + v.y * m.r[1][0] + v.z * m.r[2][0] + 1.0f * m.r[3][0];
+	result.y = v.x * m.r[0][1] + v.y * m.r[1][1] + v.z * m.r[2][1] + 1.0f * m.r[3][1];
+	result.z = v.x * m.r[0][2] + v.y * m.r[1][2] + v.z * m.r[2][2] + 1.0f * m.r[3][2];
+	float w = v.x * m.r[0][3] + v.y * m.r[1][3] + v.z * m.r[2][3] + 1.0f * m.r[3][3];
+	assert(w != 0.0f);
+	result.x /= w;
+	result.y /= w;
+	result.z /= w;
+	return result;
+}
+
 Float3 Float3::TransformNormal(const Float3& v, const Matrix& m) { 
 	return Float3{
 		v.x * m.r[0][0] + v.y * m.r[1][0] + v.z * m.r[2][0], 

@@ -50,6 +50,8 @@ public:
 
 	static Matrix Orthographic(float width, float height, float nearClip, float farClip);
 
+	static Matrix MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth);
+
 	static Matrix Scaling(Float3 scale);
 
 	static Matrix Translation(Float3 translation);

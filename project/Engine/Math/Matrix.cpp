@@ -270,6 +270,32 @@ Matrix Matrix::Orthographic(float width, float height, float nearClip, float far
 	);
 }
 
+Matrix Matrix::MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth) { 
+	Matrix result = Identity();
+
+	result.r[0][0] = width / 2.0f;
+	result.r[0][1] = 0.0f;
+	result.r[0][2] = 0.0f;
+	result.r[0][3] = 0.0f;
+
+	result.r[1][0] = 0.0f;
+	result.r[1][1] = -height / 2.0f;
+	result.r[1][2] = 0.0f;
+	result.r[1][3] = 0.0f;
+
+	result.r[2][0] = 0.0f;
+	result.r[2][1] = 0.0f;
+	result.r[2][2] = maxDepth - minDepth;
+	result.r[2][3] = 0.0f;
+
+	result.r[3][0] = left + (width / 2.0f);
+	result.r[3][1] = top + (height / 2.0f);
+	result.r[3][2] = minDepth;
+	result.r[3][3] = 1.0f;
+
+	return result;
+}
+
 Matrix Matrix::Scaling(Float3 scale)
 {
 	Matrix ret = Matrix();

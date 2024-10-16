@@ -1,9 +1,16 @@
 #include "Player.h"
 #include <cassert>
 #include "ImguiWrapper.h"
+#include "MyWindow.h"
+#include "Camera.h"
 
 void Player::Initialize(Input* input, ModelManager::ModelData* modelPlayer, ModelManager::ModelData* modelPlayerBullet) {
+	DirectXBase* dxBase = DirectXBase::GetInstance();
+	// inputを引数から受けとる
 	input_ = input;
+	// SpriteCommonの生成と初期化
+	spriteCommon = std::make_unique<SpriteCommon>();
+	spriteCommon->Initialize(DirectXBase::GetInstance());
 
 	// NULLポインタチェック
 	assert(modelPlayer);
@@ -18,6 +25,13 @@ void Player::Initialize(Input* input, ModelManager::ModelData* modelPlayer, Mode
 	// 3Dレティクルオブジェクトの生成
 	object3DReticle_ = std::make_unique<Object3D>();
 	object3DReticle_->model_ = modelPlayer; // なんでもいいので一旦入れておく
+
+	// 2Dレティクルスプライトの生成
+	uint32_t reticleGH = TextureManager::Load("resources/Images/reticle.png", dxBase->GetDevice());
+	sprite2DReticle_ = std::make_unique<Sprite>();
+	sprite2DReticle_->Initialize(spriteCommon.get(), reticleGH);
+	sprite2DReticle_->SetAnchorPoint({0.5f, 0.5f}); // アンカーポイントを中心に設定
+	sprite2DReticle_->SetSize({128.0f, 128.0f});
 }
 
 void Player::Update() {
@@ -37,6 +51,35 @@ void Player::Update() {
 	// 3Dレティクルの座標を設定
 	object3DReticle_->transform_.translate = objectPlayer_->transform_.translate + offset;
 	object3DReticle_->UpdateMatrix();
+
+
+	// 3Dレティクルのワールド座標から2Dレティクルのスクリーン座標を計算
+	// 3Dレティクルのワールド行列から、ワールド座標を取得
+	Float3 positionReticle = {
+		object3DReticle_->worldMatrix_.r[3][0], 
+		object3DReticle_->worldMatrix_.r[3][1], 
+		object3DReticle_->worldMatrix_.r[3][2]
+	};
+
+	// ビュー行列
+	Matrix viewMatrix = Camera::GetCurrent()->MakeViewMatrix();
+	// プロジェクション行列
+	Matrix projectionMatrix = Camera::GetCurrent()->MakePerspectiveFovMatrix();
+	// ビューポート行列
+	Matrix matViewport = Matrix::MakeViewportMatrix(0, 0, static_cast<float>(Window::GetWidth()), static_cast<float>(Window::GetHeight()), 0, 1);
+
+	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
+	Matrix matViewProjectionViewport = viewMatrix * projectionMatrix * matViewport;
+	// ワールド->スクリーン座標変換
+	positionReticle = Float3::Transform(positionReticle, matViewProjectionViewport);
+	// スプライトのレティクルに座標設定
+	sprite2DReticle_->SetPosition({positionReticle.x, positionReticle.y});
+
+	///
+	///	2Dレティクルの更新
+	///		
+
+	sprite2DReticle_->Update();
 
 	///
 	///	移動処理
@@ -101,7 +144,7 @@ void Player::Draw() {
 	objectPlayer_->Draw();
 
 	// 3Dレティクルを描画
-	object3DReticle_->Draw();
+	/*object3DReticle_->Draw();*/
 
 	// 弾を描画
 	for (auto& bullet : bullets_) {
@@ -110,6 +153,11 @@ void Player::Draw() {
 
 	// デバッグ表示
 	Debug();
+}
+
+void Player::DrawUI() { 
+	// 2Dレティクルを描画
+	sprite2DReticle_->Draw(); 
 }
 
 void Player::Attack() { 
